@@ -1,10 +1,14 @@
 package com.epm.reto.Principal;
 
+import com.epm.reto.model.DatosJson;
+import com.epm.reto.model.DatosLibro;
 import com.epm.reto.model.Libro;
 import com.epm.reto.service.ConsumoAPI;
 import com.epm.reto.service.ConvierteDatos;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Principal {
@@ -60,7 +64,22 @@ public class Principal {
 
 
     private void buscarLibroPorTituloAPI() {
-        System.out.println(1);
+        Utils data = new Utils();
+
+        System.out.println("Escribe nombre de libro a buscar:");
+        var dataIn = sc.nextLine();
+        DatosJson datosJson = data.getData(dataIn);
+        DatosLibro dataLibro = datosJson.libros().get(0);
+//        System.out.println(datosJson);
+
+        Optional<Libro> libroResult = Optional.of(new Libro(dataLibro));
+        if (libroResult.isPresent()) {
+            Libro lib = libroResult.get();
+            libros.add(lib);
+            System.out.println(lib);
+        }else{
+            System.out.println("El libro no existe en la base de datos de Gutendex");
+        }
     }
 
     private void librosRegistrados() {
