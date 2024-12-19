@@ -7,6 +7,7 @@ import com.epm.reto.service.ConsumoAPI;
 import com.epm.reto.service.ConvierteDatos;
 
 import javax.swing.text.html.Option;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -19,7 +20,7 @@ public class Principal {
     private ConsumoAPI consumoAPI = new ConsumoAPI();
     private ConvierteDatos convierteDatos = new ConvierteDatos();
     //
-    private List<Libro> libros;
+    private List<Libro> libros = new ArrayList<>();
 
     public void menu() {
         var option = -1;
@@ -54,6 +55,7 @@ public class Principal {
                     break;
                 case 0:
                     System.out.println("Cerrando aplicación...");
+                    System.out.println(libros);
                     break;
                 default:
                     System.out.println("Opción Invalida.");

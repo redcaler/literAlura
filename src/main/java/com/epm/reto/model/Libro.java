@@ -1,24 +1,40 @@
 package com.epm.reto.model;
 
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+@Entity
+@Table(name = "libros")
 public class Libro {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(unique = true, nullable = false)
     private String titulo;
-    private List<Autor> autores;
-    private List<String> idioma;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "libro_autor",
+            joinColumns = @JoinColumn(name = "libro_id"),
+            inverseJoinColumns = @JoinColumn(name = "autor_id")
+    )
+    private Set<Autor> autores = new HashSet<>();
+    private String idioma;
     private Boolean copyright;
     private Integer totalDescargas;
 
     public Libro(DatosLibro datosLibro) {
         this.titulo = datosLibro.titulo();
 
-        List<DatosAutor> dataAutores = datosLibro.autores();
+        Set<DatosAutor> dataAutores = datosLibro.autores();
         this.autores = dataAutores.stream()
                 .map(Autor::new)
-                .collect(Collectors.toList());
-        this.idioma = datosLibro.idioma();
+                .collect(Collectors.toSet());
+        this.idioma = datosLibro.idioma().get(0); // el primer idioma
         this.copyright = datosLibro.copyright();
         this.totalDescargas = datosLibro.totalDescargas();
     }
@@ -30,7 +46,7 @@ public class Libro {
         return  "---- Libro ----" + '\n' +
                 "Titulo: " + titulo + '\n' +
                 "Autores: " + autores + '\n' +
-                "Idioma: " + idioma.get(0) + '\n' +
+                "Idioma: " + idioma + '\n' +
                 "Copyright: " + copyright + '\n' +
                 "Total de descargas: " + totalDescargas + '\n' +
                 "---------------" + '\n';
@@ -52,19 +68,19 @@ public class Libro {
         this.titulo = titulo;
     }
 
-    public List<Autor> getAutores() {
+    public Set<Autor> getAutores() {
         return autores;
     }
 
-    public void setAutores(List<Autor> autores) {
+    public void setAutores(Set<Autor> autores) {
         this.autores = autores;
     }
 
-    public List<String> getIdioma() {
+    public String getIdioma() {
         return idioma;
     }
 
-    public void setIdioma(List<String> idioma) {
+    public void setIdioma(String idioma) {
         this.idioma = idioma;
     }
 
