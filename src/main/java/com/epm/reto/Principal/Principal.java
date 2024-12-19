@@ -1,16 +1,16 @@
 package com.epm.reto.Principal;
 
+import com.epm.reto.model.Autor;
 import com.epm.reto.model.DatosJson;
 import com.epm.reto.model.DatosLibro;
 import com.epm.reto.model.Libro;
+import com.epm.reto.repository.AutorRepository;
+import com.epm.reto.repository.LibroRepository;
 import com.epm.reto.service.ConsumoAPI;
 import com.epm.reto.service.ConvierteDatos;
 
 import javax.swing.text.html.Option;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 public class Principal {
     // constantes
@@ -20,7 +20,14 @@ public class Principal {
     private ConsumoAPI consumoAPI = new ConsumoAPI();
     private ConvierteDatos convierteDatos = new ConvierteDatos();
     //
-    private List<Libro> libros = new ArrayList<>();
+//    private List<Libro> libros = new ArrayList<>();
+
+    private LibroRepository libroRepo;
+    private AutorRepository autorRepo;
+    public Principal(LibroRepository libroRepository, AutorRepository autorRepository) {
+        this.libroRepo = libroRepository;
+        this.autorRepo = autorRepository;
+    }
 
     public void menu() {
         var option = -1;
@@ -55,7 +62,6 @@ public class Principal {
                     break;
                 case 0:
                     System.out.println("Cerrando aplicación...");
-                    System.out.println(libros);
                     break;
                 default:
                     System.out.println("Opción Invalida.");
@@ -71,20 +77,38 @@ public class Principal {
         System.out.println("Escribe nombre de libro a buscar:");
         var dataIn = sc.nextLine();
         DatosJson datosJson = data.getData(dataIn);
-        DatosLibro dataLibro = datosJson.libros().get(0);
-//        System.out.println(datosJson);
+        if (!datosJson.libros().isEmpty()) {
+            DatosLibro dataLibro = datosJson.libros().get(0);
 
-        Optional<Libro> libroResult = Optional.of(new Libro(dataLibro));
-        if (libroResult.isPresent()) {
-            Libro lib = libroResult.get();
-            libros.add(lib);
-            System.out.println(lib);
+            Optional<Libro> libroResult = Optional.of(new Libro(dataLibro));
+            Libro libro = libroResult.get();
+
+            if (libroRepo.findByTituloIgnoreCase(libro.getTitulo()) == null) {
+                Set<Autor> autoresExistentes = new HashSet<>();
+
+                for (Autor autor : libro.getAutores()) {
+                    Autor autorExistente = autorRepo.findByNombreIgnoreCase(autor.getNombre());
+                    if (autorExistente != null) {
+                        autoresExistentes.add(autorExistente);
+                    }else{
+                        autorExistente = autorRepo.save(autor);
+                        autoresExistentes.add(autorExistente);
+                    }
+                }
+
+                libro.setAutores(autoresExistentes);
+                libroRepo.save(libro);
+            }else{
+                System.out.println("El libro ya se encuentra en la base de datos");
+            }
         }else{
             System.out.println("El libro no existe en la base de datos de Gutendex");
         }
     }
 
+
     private void librosRegistrados() {
+
         System.out.println(2);
     }
 

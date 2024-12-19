@@ -15,7 +15,7 @@ public class Autor {
     private String nombre;
     private Integer nacimiento;
     private Integer muerte;
-    @ManyToMany(mappedBy = "autores", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "autores", cascade = CascadeType.MERGE)
     private Set<Libro> libros = new HashSet<>();
 
     public  Autor(DatosAutor datosAutor){
@@ -30,6 +30,14 @@ public class Autor {
     public String toString() {
         return "[ Autor: '" + nombre + '\'' + " -> " +
                 nacimiento + " a " + muerte + " ]";
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -56,4 +64,11 @@ public class Autor {
         this.muerte = muerte;
     }
 
+    public Set<Libro> getLibros() {
+        return libros;
+    }
+
+    public void setLibros(Set<Libro> libros) {
+        this.libros = libros;
+    }
 }
