@@ -33,6 +33,7 @@ public class Principal {
         var option = -1;
         while (option != 0) {
             var menu = """
+                    
                     Elija la opción a través de su número:
                     1- buscar libro por título
                     2- listar Libros registrados
@@ -98,6 +99,7 @@ public class Principal {
 
                 libro.setAutores(autoresExistentes);
                 libroRepo.save(libro);
+                System.out.println(libro);
             }else{
                 System.out.println("El libro ya se encuentra en la base de datos");
             }
@@ -106,21 +108,63 @@ public class Principal {
         }
     }
 
-
     private void librosRegistrados() {
-
-        System.out.println(2);
+        Optional<List<Libro>> libroOptional = libroRepo.findAllLibros();
+        if (libroOptional.isPresent()) {
+            List<Libro> libros = libroOptional.get();
+            libros.forEach(System.out::println);
+        }else{
+            System.out.println("No hay libros registrados");
+        }
     }
 
     private void autoresRegistrados() {
-        System.out.println(3);
+        Optional<List<Autor>> autorOptional = autorRepo.findAllAutores();
+        if (autorOptional.isPresent()) {
+            List<Autor> autores = autorOptional.get();
+            autores.forEach(System.out::println);
+        }else{
+            System.out.println("No hay Autores registrados");
+        }
     }
 
     private void autoresVivosPorAnio() {
+        System.out.println("Ingrese año objetivo: ");
+        Integer anioObjetivo = Integer.valueOf(sc.nextLine());
+        Optional<List<Autor>> autorOptional = autorRepo.findAutoresVivos(anioObjetivo);
+        if (autorOptional.isPresent()) {
+            List<Autor> autores = autorOptional.get();
+            autores.forEach(System.out::println);
+        }else{
+            System.out.println("No hay Autores registrados");
+        }
         System.out.println(4);
     }
 
     private void librosPorIdioma() {
-        System.out.println(5);
+        generarListaIdiomas();
+        System.out.println("Escribe las siglas del idioma a filtrar:");
+        String idiomaSelect = sc.nextLine();
+        Optional<List<Libro>> libroOptional = libroRepo.findByIdiomaIgnoreCase(idiomaSelect);
+        if (libroOptional.isPresent()) {
+            List<Libro> libro = libroOptional.get();
+            libro.forEach(System.out::println);
+        }else{
+            System.out.println("No hay Libros registrados en ese idioma");
+        }
+    }
+
+    private void generarListaIdiomas(){
+        Optional<List<String>> idiomasOptional = libroRepo.getIdiomaLibros();
+        if (idiomasOptional.isPresent()) {
+            List<String> idiomas = idiomasOptional.get();
+            System.out.println("Idiomas Disponibles");
+            for (int i=0; i<idiomas.size(); i++) {
+                System.out.println(i+1 + ": " + idiomas.get(i));
+            }
+
+        }else{
+            System.out.println("No hay libros registrados");
+        }
     }
 }
